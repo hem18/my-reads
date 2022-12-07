@@ -3,9 +3,13 @@ import { useState } from "react";
 import * as BooksApi from "../BooksAPI";
 import BookShelfChanger from "./BookShelfChanger";
 
-const Search = ({onSearch}) => {
+const Search = ({books, onSearch}) => {
     const [query, setQuery] = useState("");
     const [searchResults, setSearchresults] = useState([]);
+    let bookMap = new Map();
+    books.forEach(e => {
+        bookMap.set(e.id, e.shelf);
+    });
 
     const updateQuery = (query) => {
         setQuery(query);
@@ -24,7 +28,15 @@ const Search = ({onSearch}) => {
                 if (query.length > 0) {
                     const res = await BooksApi.search(query);
                     if (res !== "") {
-                        setSearchresults(res);
+                        let alteredRes = res.map(o => {
+                            if (bookMap.has(o.id)) {
+                                o.shelf = bookMap.get(o.id);
+                            } else {
+                                o.shelf = "none";
+                            }
+                            return o;
+                        });
+                        setSearchresults(alteredRes);
                     } else {
                         setSearchresults([]);
                     }
@@ -49,7 +61,7 @@ const Search = ({onSearch}) => {
           <div className="search-books-results">
             <ol className="books-grid">
                 {
-                    searchResults.map(o =>
+                    searchResults.filter(f => f.imageLinks).map(o =>
                         <li key={o.id}>
                                 <div className="book">
                                     <div className="book-top">
@@ -61,7 +73,7 @@ const Search = ({onSearch}) => {
                                             backgroundImage: `url(${o.imageLinks.thumbnail})`                                            
                                             }}
                                         ></div>
-                                        <BookShelfChanger value="none" onBookChange={(shelf) => shelfChange(shelf, o)}/>
+                                        <BookShelfChanger value={o.shelf} onBookChange={(shelf) => shelfChange(shelf, o)}/>
                                     </div>
                                     <div className="book-title">
                                         {o.title}
