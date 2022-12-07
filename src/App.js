@@ -38,7 +38,7 @@ const App = () => {
           }
         />
         <Route path="/search" element={
-            <Search onSearch={updateBooks}/>
+            <Search books={books} onSearch={updateBooks}/>
           }
         />
       </Routes>
