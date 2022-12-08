@@ -15,18 +15,21 @@ const App = () => {
     getBooks();
   }, []);
 
-  const updateBooks = (book, shelf) => {
+  const updateBooks = (book, shelf, op) => {
     const updates = async () => {
       await BooksApi.update(book, shelf);
       book.shelf = shelf;
-      setBooks(books.map(o => {
-        if (o.id === book.id) {
-          o.shelf = shelf;
-        }
-        return o;
-      }).concat(book));
+      if (op === "update") {
+        setBooks(books.map(o => {
+          if (o.id === book.id) {
+            o.shelf = shelf;
+          }
+          return o;
+        }));
+      } else {
+        setBooks(books.concat(book));
+      }
     };
-    
     updates();
   }
   return (
