@@ -30,5 +30,5 @@ const Book = ({ book, onUpdate }) => {
 Book.propTypes = {
     book: PropTypes.object.isRequired,
     onUpdate: PropTypes.func.isRequired
-}
+};
 export default Book;
