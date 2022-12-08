@@ -1,12 +1,8 @@
-import BookShelfChanger from "./BookShelfChanger";
+import Book from "./Book";
 import {Link} from "react-router-dom";
+import PropTypes from "prop-types";
 
 const ListBooks = ({books, onUpdate}) => {
-    const shelfChange = (shelf, book) => {
-        if (onUpdate) {
-           onUpdate(book, shelf);
-        }
-    }
     return (
         <div className="list-books">
           <div className="list-books-title">
@@ -20,25 +16,9 @@ const ListBooks = ({books, onUpdate}) => {
                   <ol className="books-grid">
                     {
                         books.filter(e => e.shelf === "currentlyReading").map(o =>
-                            <li key={o.id}>
-                                <div className="book">
-                                    <div className="book-top">
-                                        <div
-                                            className="book-cover"
-                                            style={{
-                                            width: 128,
-                                            height: 192,
-                                            backgroundImage: `url(${o.imageLinks.thumbnail})`                            
-                                            }}
-                                        ></div>
-                                        <BookShelfChanger value="currentlyReading" onBookChange={(shelf) => shelfChange(shelf, o)} />
-                                    </div>
-                                    <div className="book-title">
-                                        {o.title}
-                                    </div>
-                                    <div className="book-authors">{o.authors}</div>
-                                </div>
-                            </li>
+                          <li key={o.id}>
+                            <Book book={o} onUpdate={onUpdate}/>
+                          </li>
                         )
                     }
                   </ol>
@@ -50,25 +30,9 @@ const ListBooks = ({books, onUpdate}) => {
                   <ol className="books-grid">
                     {
                         books.filter(e => e.shelf === "wantToRead").map(o =>
-                            <li key={o.id}>
-                                <div className="book">
-                                    <div className="book-top">
-                                        <div
-                                            className="book-cover"
-                                            style={{
-                                            width: 128,
-                                            height: 192,
-                                            backgroundImage:`url(${o.imageLinks.thumbnail})`
-                                            }}
-                                        ></div>
-                                        <BookShelfChanger value="wantToRead" onBookChange={(shelf) => shelfChange(shelf, o)}/>
-                                    </div>
-                                    <div className="book-title">
-                                        {o.title}
-                                    </div>
-                                    <div className="book-authors">{o.authors}</div>
-                                </div>
-                            </li>
+                          <li key={o.id}>
+                            <Book book={o} onUpdate={onUpdate}/>
+                          </li>
                         )
                     }
                   </ol>
@@ -80,25 +44,9 @@ const ListBooks = ({books, onUpdate}) => {
                   <ol className="books-grid">
                     {
                         books.filter(e => e.shelf === "read").map(o =>
-                            <li key={o.id}>
-                                <div className="book">
-                                    <div className="book-top">
-                                        <div
-                                            className="book-cover"
-                                            style={{
-                                            width: 128,
-                                            height: 192,
-                                            backgroundImage: `url(${o.imageLinks.thumbnail})`                                            
-                                            }}
-                                        ></div>
-                                        <BookShelfChanger value="read" onBookChange={(shelf) => shelfChange(shelf, o)}/>
-                                    </div>
-                                    <div className="book-title">
-                                        {o.title}
-                                    </div>
-                                    <div className="book-authors">{o.authors}</div>
-                                </div>
-                            </li>
+                          <li key={o.id}>
+                            <Book book={o} onUpdate={onUpdate}/>
+                          </li>
                         )
                     }
                   </ol>
@@ -108,11 +56,16 @@ const ListBooks = ({books, onUpdate}) => {
           </div>
           <div className="open-search">
             <Link to={"/search"} className="add-contact">
-                    Add Contact
-              </Link>
+              Add Contact
+            </Link>
           </div>
         </div>
     );
 }
+
+ListBooks.propTypes = {
+  books: PropTypes.array.isRequired,
+  onUpdate: PropTypes.func.isRequired
+};
 
 export default ListBooks;

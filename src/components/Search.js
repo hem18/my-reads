@@ -1,33 +1,37 @@
 import {Link} from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import * as BooksApi from "../BooksAPI";
 import BookShelfChanger from "./BookShelfChanger";
+import useDebounce from "./useDebounce";
+import PropTypes from "prop-types";
 
 const Search = ({books, onSearch}) => {
     const [query, setQuery] = useState("");
     const [searchResults, setSearchresults] = useState([]);
-    let bookMap = new Map();
-    books.forEach(e => {
-        bookMap.set(e.id, e.shelf);
-    });
+    const debouncedValue = useDebounce(query, 500);
+    const bookMap = useMemo(() => {
+        let map = new Map(); 
+        books.forEach(e => {
+            map.set(e.id, e.shelf);
+        });
+        return map;
+    }, [books]);
 
-    const updateQuery = (query) => {
-        setQuery(query);
-        if (query !== "") {
-            searchBooks();
-        } else {
+    const updateQuery = (q) => {
+        setQuery(q);
+        if (q === "") {
             setSearchresults([]);
         }
     };
     const shelfChange = (shelf, book) => {
-        onSearch(book, shelf);
+        onSearch(book, shelf, "add");
     };
 
-    const searchBooks = () => {
+    useEffect(() => {
             const bookSearch = async () => {
-                if (query.length > 0) {
-                    const res = await BooksApi.search(query);
-                    if (res !== "") {
+                if (debouncedValue !== "") {
+                    const res = await BooksApi.search(debouncedValue);
+                    if (res && !res.error) {
                         let alteredRes = res.map(o => {
                             if (bookMap.has(o.id)) {
                                 o.shelf = bookMap.get(o.id);
@@ -40,10 +44,11 @@ const Search = ({books, onSearch}) => {
                     } else {
                         setSearchresults([]);
                     }
-                } 
+                }
             }
             bookSearch();
-    };
+    }, [bookMap, debouncedValue]);
+    
     return (
         <div className="search-books">
           <div className="search-books-bar">
@@ -87,6 +92,11 @@ const Search = ({books, onSearch}) => {
           </div>
         </div>
     );
+};
+
+Search.propTypes = {
+    books: PropTypes.array.isRequired, 
+    onSearch: PropTypes.func.isRequired
 };
 
 export default Search;
